@@ -4,3 +4,45 @@ GET {{HotelListing_Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+// Get all hotels
+GET {{HotelListing_Api_HostAddress}}/api/hotels
+Accept: application/json
+
+###
+
+// Get hotel by id
+GET {{HotelListing_Api_HostAddress}}/api/hotels/1
+Accept: application/json
+
+###
+
+// Create a new hotel
+POST {{HotelListing_Api_HostAddress}}/api/hotels
+Content-Type: application/json
+
+{
+    "id": 4,
+    "name": "New Hotel",
+    "address": "123 Main St",
+    "rating": 5
+}
+
+###
+
+// Update an existing hotel
+PUT {{HotelListing_Api_HostAddress}}/api/hotels/1
+Content-Type: application/json
+
+{
+    "name": "Updated Hotel",
+    "address": "123 Main St",
+    "rating": 4
+}
+
+###
+
+// Delete a hotel
+DELETE {{HotelListing_Api_HostAddress}}/api/hotels/4
+Accept: application/json
+
