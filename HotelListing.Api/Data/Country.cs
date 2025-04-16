@@ -4,9 +4,9 @@ namespace HotelListing.Api.Data;
 
 public class Country
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = "";
-    public string ShortName { get; set; } = "";
+    public int CountryId { get; set; }
+    public string Name { get; set; } = null!;
+    public string ShortName { get; set; } = null!;
 
-    public virtual IList<Hotel> Hotels { get; set; } = new List<Hotel>();
+    public IList<Hotel> Hotels { get; set; } = new List<Hotel>();
 }
