@@ -23,11 +23,11 @@ namespace HotelListing.Api.Migrations
 
             modelBuilder.Entity("HotelListing.Api.Data.Country", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("CountryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -37,29 +37,9 @@ namespace HotelListing.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("CountryId");
 
                     b.ToTable("Countries");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Jamaica",
-                            ShortName = "JM"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Bahamas",
-                            ShortName = "BS"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Cayman Islands",
-                            ShortName = "CI"
-                        });
                 });
 
             modelBuilder.Entity("HotelListing.Api.Data.Hotel", b =>
@@ -89,32 +69,6 @@ namespace HotelListing.Api.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("Hotels");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Address = "Negril",
-                            CountryId = 1,
-                            Name = "Sandals Resort and Spa",
-                            Rating = 4.5
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "Nassau",
-                            CountryId = 2,
-                            Name = "Grand Palladium",
-                            Rating = 4.0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Address = "Grand Cayman",
-                            CountryId = 3,
-                            Name = "Ritz Carlton",
-                            Rating = 4.5
-                        });
                 });
 
             modelBuilder.Entity("HotelListing.Api.Data.Hotel", b =>
