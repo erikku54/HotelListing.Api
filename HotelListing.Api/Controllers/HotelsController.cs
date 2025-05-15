@@ -10,9 +10,27 @@ public class HotelsController : ControllerBase
 {
     private static readonly List<Hotel> _hotels = new()
     {
-        new Hotel { Id = 1, Name = "Hotel One", Address = "Address One", Rating = 4.5 },
-        new Hotel { Id = 2, Name = "Hotel Two", Address = "Address Two", Rating = 4.0 },
-        new Hotel { Id = 3, Name = "Hotel Three", Address = "Address Three", Rating = 3.5 }
+        new Hotel
+        {
+            Id = 1,
+            Name = "Hotel One",
+            Address = "Address One",
+            Rating = 4.5,
+        },
+        new Hotel
+        {
+            Id = 2,
+            Name = "Hotel Two",
+            Address = "Address Two",
+            Rating = 4.0,
+        },
+        new Hotel
+        {
+            Id = 3,
+            Name = "Hotel Three",
+            Address = "Address Three",
+            Rating = 3.5,
+        },
     };
 
     // GET: api/Hotels
@@ -79,4 +97,3 @@ public class HotelsController : ControllerBase
         return NoContent();
     }
 }
-
