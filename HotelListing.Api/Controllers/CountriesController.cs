@@ -1,6 +1,9 @@
+using AutoMapper;
 using HotelListing.Api.Data;
+using HotelListing.Api.Models.Country;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace HotelListing.Api.Controllers;
 
@@ -9,10 +12,12 @@ namespace HotelListing.Api.Controllers;
 public class CountriesController : ControllerBase
 {
     private readonly HotelListingDbContext _context;
+    private readonly IMapper _mapper;
 
-    public CountriesController(HotelListingDbContext context)
+    public CountriesController(HotelListingDbContext context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     // GET: api/Countries
@@ -39,11 +44,15 @@ public class CountriesController : ControllerBase
 
     // POST: api/Countries
     [HttpPost]
-    public async Task<ActionResult<Country>> PostCountry(Country country)
+    public async Task<ActionResult<Country>> PostCountry(CreateCountryDto createCountry)
     {
+        var country = _mapper.Map<Country>(createCountry);
+
+        // Add the new country to the database
         _context.Countries.Add(country);
         await _context.SaveChangesAsync();
 
+        // Return the created country with a 201 Created status code
         return CreatedAtAction(nameof(GetCountry), new { id = country.CountryId }, country);
     }
 
