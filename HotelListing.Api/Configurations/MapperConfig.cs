@@ -10,7 +10,11 @@ public class MapperConfig : Profile
     public MapperConfig()
     {
         CreateMap<Country, CreateCountryDto>().ReverseMap();
-        CreateMap<Country, GetCountryDto>().ReverseMap();
+        CreateMap<Country, GetCountryDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CountryId))
+            .ReverseMap()
+            .ForMember(dest => dest.CountryId, opt => opt.MapFrom(src => src.Id));
+
         CreateMap<Country, UpdateCountryDto>().ReverseMap();
         CreateMap<Country, CountryDto>().ReverseMap();
 

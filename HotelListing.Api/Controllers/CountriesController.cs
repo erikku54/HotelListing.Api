@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using AutoMapper;
+using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
 using HotelListing.Api.Models.Country;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +13,12 @@ namespace HotelListing.Api.Controllers;
 [ApiController]
 public class CountriesController : ControllerBase
 {
-    private readonly HotelListingDbContext _context;
+    private readonly ICountriesRepository _countryRepository;
     private readonly IMapper _mapper;
 
-    public CountriesController(HotelListingDbContext context, IMapper mapper)
+    public CountriesController(ICountriesRepository repository, IMapper mapper)
     {
-        _context = context;
+        _countryRepository = repository;
         _mapper = mapper;
     }
 
@@ -24,7 +26,7 @@ public class CountriesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
     {
-        var countries = await _context.Countries.ToListAsync();
+        var countries = await _countryRepository.GetAllAsync();
         var results = _mapper.Map<List<GetCountryDto>>(countries);
 
         return Ok(results);
@@ -34,9 +36,7 @@ public class CountriesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<CountryDto>> GetCountry(int id)
     {
-        var country = await _context
-            .Countries.Include(c => c.Hotels)
-            .FirstOrDefaultAsync(c => c.CountryId == id);
+        var country = await _countryRepository.GetDetails(id);
 
         if (country == null)
         {
@@ -55,8 +55,7 @@ public class CountriesController : ControllerBase
         var country = _mapper.Map<Country>(createCountry);
 
         // Add the new country to the database
-        _context.Countries.Add(country);
-        await _context.SaveChangesAsync();
+        await _countryRepository.AddAsync(country);
 
         // Return the created country with a 201 Created status code
         return CreatedAtAction(nameof(GetCountry), new { id = country.CountryId }, country);
@@ -71,8 +70,7 @@ public class CountriesController : ControllerBase
             return BadRequest();
         }
 
-        // Check if the country exists
-        var country = await _context.Countries.FindAsync(id);
+        var country = await _countryRepository.GetByIdAsync(id);
         if (country == null)
         {
             return NotFound();
@@ -82,15 +80,18 @@ public class CountriesController : ControllerBase
         // 因為country是被tracked的entity，所以不需要再set state
         // EF Core會自動標註為modified，而在SaveChanges時會自動更新
         // _context.Entry(country).State = EntityState.Modified;
+        // _mapper.Map(updateCountryDto, country);
+        // await _context.SaveChangesAsync();
+
         _mapper.Map(updateCountryDto, country);
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _countryRepository.UpdateAsync(country);
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!CountryExists(id))
+            if (!await CountryExists(id))
             {
                 return NotFound();
             }
@@ -107,20 +108,20 @@ public class CountriesController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCountry(int id)
     {
-        var country = await _context.Countries.FindAsync(id);
+        var country = await _countryRepository.GetByIdAsync(id);
         if (country == null)
         {
             return NotFound();
         }
 
-        _context.Countries.Remove(country);
-        await _context.SaveChangesAsync();
+        await _countryRepository.DeleteAsync(id);
 
         return NoContent();
     }
 
-    private bool CountryExists(int id)
+    private async Task<bool> CountryExists(int id)
     {
-        return _context.Countries.Any(e => e.CountryId == id);
+        // return _context.Countries.Any(e => e.CountryId == id);
+        return await _countryRepository.Exists(id);
     }
 }
