@@ -22,22 +22,28 @@ public class CountriesController : ControllerBase
 
     // GET: api/Countries
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
+    public async Task<ActionResult<IEnumerable<GetCountryDto>>> GetCountries()
     {
         var countries = await _context.Countries.ToListAsync();
-        return Ok(countries);
+        var results = _mapper.Map<List<GetCountryDto>>(countries);
+
+        return Ok(results);
     }
 
     // GET: api/Countries/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Country>> GetCountry(int id)
+    public async Task<ActionResult<CountryDto>> GetCountry(int id)
     {
-        var country = await _context.Countries.FindAsync(id);
+        var country = await _context
+            .Countries.Include(c => c.Hotels)
+            .FirstOrDefaultAsync(c => c.CountryId == id);
 
         if (country == null)
         {
             return NotFound();
         }
+
+        var result = _mapper.Map<CountryDto>(country);
 
         return Ok(country);
     }
@@ -58,14 +64,25 @@ public class CountriesController : ControllerBase
 
     // PUT: api/Countries/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCountry(int id, Country country)
+    public async Task<IActionResult> PutCountry(int id, UpdateCountryDto updateCountryDto)
     {
-        if (id != country.CountryId)
+        if (id != updateCountryDto.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(country).State = EntityState.Modified;
+        // Check if the country exists
+        var country = await _context.Countries.FindAsync(id);
+        if (country == null)
+        {
+            return NotFound();
+        }
+
+        // Map the updated properties from the DTO to the entity
+        // 因為country是被tracked的entity，所以不需要再set state
+        // EF Core會自動標註為modified，而在SaveChanges時會自動更新
+        // _context.Entry(country).State = EntityState.Modified;
+        _mapper.Map(updateCountryDto, country);
 
         try
         {

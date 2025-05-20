@@ -1,5 +1,7 @@
 using HotelListing.Api.Configurations;
+using HotelListing.Api.Contracts;
 using HotelListing.Api.Data;
+using HotelListing.Api.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddAutoMapper(typeof(MapperConfig)); // 註冊 AutoMapper 服務
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<ICountriesRepository, CountriesRepository>();
 
 var app = builder.Build();
 
